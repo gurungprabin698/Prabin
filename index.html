@@ -339,7 +339,6 @@
             ctx.fillStyle = color;
             
             if (isSpiky) {
-                // Draw star spikes
                 ctx.beginPath();
                 for (let i = 0; i < 5; i++) {
                     ctx.lineTo(Math.cos((18 + i * 72) / 180 * Math.PI) * size + x,
@@ -354,10 +353,7 @@
                 ctx.arc(x, y, size, 0, Math.PI * 2);
                 ctx.fill();
             }
-
-            // Glow effect (Expensive but safe on Canvas)
-            ctx.shadowBlur = brightness * 10;
-            ctx.shadowColor = color;
+            // Removed expensive shadowBlur for better mobile performance
         }
 
         // Viewport Culling & Visibility State
@@ -373,36 +369,57 @@
             }
         });
 
-        function updateFrame() {
-            if (!isPageVisible) return; // Failsafe pause
+        let isAnimating = false;
+        let lastInputX = 0, lastInputY = 0;
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
+        function updateFrame() {
+            if (!isPageVisible) {
+                isAnimating = false;
+                return;
+            }
+
+            const width = window.innerWidth;
+            const isMobile = width < 768;
+            const isTablet = width >= 768 && width < 1024;
+            const isDesktop = width >= 1024;
+
             const inputX = hasGyro ? gyroY : mouseX;
             const inputY = hasGyro ? gyroX : mouseY;
 
-            targetX = lerp(targetX, inputX, 0.08); // Smooth for background
+            // Update lerped values
+            const prevTargetX = targetX;
+            const prevTargetY = targetY;
+            targetX = lerp(targetX, inputX, 0.08);
             targetY = lerp(targetY, inputY, 0.08);
             
-            fastTargetX = lerp(fastTargetX, inputX, 0.45); // FAST reaction for icons
+            fastTargetX = lerp(fastTargetX, inputX, 0.45);
             fastTargetY = lerp(fastTargetY, inputY, 0.45);
 
-            // BG and Card movement
-            bg.style.transform = `translate3d(${targetX * -35}px, ${targetY * -35}px, 0) scale(1.18)`;
-            card.style.transform = `rotateX(${targetY * -12}deg) rotateY(${targetX * 12}deg)`;
+            // Check if we need to continue animating
+            const delta = Math.abs(targetX - prevTargetX) + Math.abs(targetY - prevTargetY) + 
+                          Math.abs(inputX - lastInputX) + Math.abs(inputY - lastInputY);
+            
+            lastInputX = inputX;
+            lastInputY = inputY;
 
-            // 3D Glare Calculation
+            // Card movement: ONLY Desktop and Tablet
+            if (isDesktop || isTablet) {
+                card.style.transform = `rotateX(${targetY * -12}deg) rotateY(${targetX * 12}deg)`;
+                bg.style.transform = `translate3d(${targetX * -35}px, ${targetY * -35}px, 0) scale(1.18)`;
+            }
+
+            // 3D Glare
             const glareX = 50 + (targetX * -80); 
             const glareY = 50 + (targetY * -80);
             const tiltMagnitude = Math.sqrt(targetX * targetX + targetY * targetY);
-            const glareOpacity = Math.min(tiltMagnitude * 2.0, 0.85); // Increased brightness cap
+            const glareOpacity = Math.min(tiltMagnitude * 2.0, 0.85);
             
             card.style.setProperty('--glare-x', `${glareX}%`);
             card.style.setProperty('--glare-y', `${glareY}%`);
             card.style.setProperty('--glare-opacity', glareOpacity);
 
-            // Social Icons (Reacts quickly to catch shaking)
-            socialIcons.forEach((icon, index) => {
+            // Social Icons
+            socialIcons.forEach((icon) => {
                 if (icon.isHovered || hasGyro) {
                     const power = icon.isHovered ? 18 : 10;
                     icon.style.transform = `translate3d(${fastTargetX * power}px, ${fastTargetY * power}px, 0) rotate(${fastTargetX * 12}deg)`;
@@ -411,32 +428,63 @@
                 }
             });
 
-            // Render Particles on Canvas with Viewport Culling
-            particles.forEach(p => {
-                p.progress += p.speed;
-                if (p.progress >= 1) {
-                    p.progress = 0;
-                    p.x = Math.random() * 100;
-                    p.y = Math.random() * 100;
-                    p.color = colors[Math.floor(Math.random() * colors.length)];
-                }
+            // Particles: ONLY Desktop
+            if (isDesktop) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.progress += p.speed;
+                    if (p.progress >= 1) {
+                        p.progress = 0;
+                        p.x = Math.random() * 100;
+                        p.y = Math.random() * 100;
+                    }
+                    const brightness = (Math.sin(p.progress * Math.PI * 2) + 1) / 2;
+                    const pX = (p.x / 100 * canvas.width) + (targetX * p.z * 60);
+                    const pY = (p.y / 100 * canvas.height) + (targetY * p.z * 60);
+                    const buffer = 20;
+                    if (pX > -buffer && pX < canvas.width + buffer && 
+                        pY > -buffer && pY < canvas.height + buffer) {
+                        drawStar(ctx, pX, pY, p.size * (0.8 + brightness * 0.4), brightness, p.color, p.isSpiky);
+                    }
+                });
+            }
 
-                const brightness = (Math.sin(p.progress * Math.PI * 2) + 1) / 2;
-                
-                // Calculate Parallax Position
-                const pX = (p.x / 100 * canvas.width) + (targetX * p.z * 60);
-                const pY = (p.y / 100 * canvas.height) + (targetY * p.z * 60);
-                
-                // VIEWPORT CULLING: Only draw if within screen bounds (plus a small buffer)
-                const buffer = 20;
-                if (pX > -buffer && pX < canvas.width + buffer && 
-                    pY > -buffer && pY < canvas.height + buffer) {
-                    drawStar(ctx, pX, pY, p.size * (0.8 + brightness * 0.4), brightness, p.color, p.isSpiky);
-                }
-            });
+            // Stop animation if there is no movement to save CPU
+            if (delta < 0.0001 && !isDesktop) {
+                isAnimating = false;
+                return;
+            }
 
             animationFrameId = requestAnimationFrame(updateFrame);
         }
+
+        // Restart animation on any input
+        function startAnimation() {
+            if (!isAnimating) {
+                isAnimating = true;
+                updateFrame();
+            }
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+            startAnimation();
+        });
+
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', (e) => {
+                if (e.beta !== null && e.gamma !== null) {
+                    hasGyro = true;
+                    gyroY = Math.max(-1, Math.min(1, e.gamma / 45));
+                    gyroX = Math.max(-1, Math.min(1, (e.beta - 45) / 45));
+                    startAnimation();
+                }
+            });
+        }
+
+        // Start
+        isAnimating = true;
 
         updateFrame();
     </script>
