@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="Prabin Gurung - Visionary Creator Digital Profile.">
+    <title>Prabin Gurung | Digital Identity</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="profile.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <style>
+        .container, .profile-card, .social-btn, .hub-btn { will-change: transform; touch-action: manipulation; }
+        .social-btn:active, .hub-btn:active { transform: scale(0.95); }
+    </style>
+</head>
+
+<body>
+    <!-- Simple Galaxy Background -->
+    <div class="galaxy-bg" id="bg">
+        <canvas id="starCanvas"></canvas>
+        <div class="nebula"></div>
+    </div>
+
+    <main class="container">
+        <section class="profile-card">
+            <!-- Animated Background Glows (Inside Card) -->
+            <div class="card-glows">
+                <div class="blob blob-1"></div>
+                <div class="blob blob-2"></div>
+                <div class="blob blob-3"></div>
+            </div>
+
+            <!-- Scrollable Inner Content -->
+            <div class="card-scroll-area">
+                <!-- Dynamic Greeting Badge (Inside Card) -->
+                <div id="greeting" class="greeting-badge">Hello!</div>
+
+                <!-- Main Avatar Section -->
+                <div class="avatar-wrapper" id="avatarTrigger">
+                    <img src="profile_pic.jpg" 
+                         onerror="this.src='profile_pic.jpg'" 
+                         alt="Prabin Gurung" class="avatar" loading="eager">
+                    <div class="avatar-glow"></div>
+                </div>
+
+                <div class="info-section">
+                    <h1 class="name">PRABIN GURUNG</h1>
+                    <div class="tags">
+                        <span class="tag">✦ Visionary Creator</span>
+                    </div>
+
+                    <!-- Bio Sub-Card -->
+                    <div class="info-card bio-box">
+                        <p class="bio">
+                            "Hello it's me Prabin, Welcome to my profile. Here you can connect with me in my official social
+                            media by clicking the social media icon below. Thank you for visiting my DIGITAL PROFILE"
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Social Media Sub-Card -->
+                <div class="info-card social-box">
+                    <div class="social-grid">
+                        <button class="social-btn youtube"
+                            data-url="https://youtube.com/@prabingurung6560?si=VdWkynKHWNjc-hX1" data-type="YouTube"
+                            aria-label="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </button>
+                        <button class="social-btn instagram"
+                            data-url="https://www.instagram.com/prabingrg999?igsh=dWFpYmNhY2N0aWty" data-type="Instagram"
+                            aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </button>
+                        <button class="social-btn facebook" data-url="https://www.facebook.com/prabin.gurung.769413"
+                            data-type="Facebook" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </button>
+                        <button class="social-btn tiktok"
+                            data-url="https://www.tiktok.com/@prabingurung7777?_r=1&_t=ZS-96KYGZmaAMK" data-type="TikTok"
+                            aria-label="TikTok">
+                            <i class="fab fa-tiktok"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <footer class="footer">
+                    <div class="footer-content">
+                        <div class="status">
+                            <span class="dot"></span>
+                            <span class="status-text">Active Now</span>
+                        </div>
+                        <button class="share-btn" id="copyLinkBtn" aria-label="Copy Profile Link">
+                            <i class="fas fa-share-nodes"></i>
+                            <span>Share Profile</span>
+                        </button>
+                    </div>
+                </footer>
+            </div>
+        </section>
+    </main>
+
+    <!-- Share Hub Modal -->
+    <div class="share-modal" id="shareModal">
+        <div class="modal-overlay" id="closeShare"></div>
+        <div class="share-hub">
+            <h2 class="hub-title" id="hubTitle">Share Profile</h2>
+
+            <div class="qr-card">
+                <div class="qr-header" id="qrHeader">
+                    <span class="qr-profile-name">PRABIN GURUNG</span>
+                    <span class="qr-platform" id="qrPlatform">YouTube</span>
+                </div>
+                <div id="qrcode" class="qr-container"></div>
+            </div>
+
+            <div class="hub-actions">
+                <a href="#" target="_blank" class="hub-btn open" id="hubOpenBtn">
+                    <i class="fas fa-external-link-alt"></i> Open Profile
+                </a>
+                <button class="hub-btn download" id="downloadQR">
+                    <i class="fas fa-download"></i> Download QR
+                </button>
+                <button class="hub-btn copy" id="copyLinkHub">
+                    <i class="fas fa-link"></i> Copy Link
+                </button>
+            </div>
+
+            <button class="close-hub" id="closeHubBtn">&times;</button>
+        </div>
+    </div>
+
+    <!-- Copy Success Toast -->
+    <div id="toast" class="toast">Link Copied!</div>
+
+    <!-- Image Lightbox Modal -->
+    <div class="image-modal" id="imageModal">
+        <div class="modal-overlay"></div>
+        <img src="profile_pic.jpg" 
+             onerror="this.src='profile_pic.jpg'" 
+             alt="Prabin Gurung Full View" class="modal-img" />
+    </div>
+
+    <!-- QR Code & Image Export Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+        // --- CONFIGURATION ---
+        const PRODUCTION_URL = "";
+
+        // 1. Dynamic Greeting System
+        const greetingEl = document.getElementById('greeting');
+        const hour = new Date().getHours();
+
+        if (hour >= 5 && hour < 12) greetingEl.textContent = "Good Morning ☀️";
+        else if (hour >= 12 && hour < 17) greetingEl.textContent = "Good Afternoon ☕";
+        else if (hour >= 17 && hour < 21) greetingEl.textContent = "Good Evening 🌙";
+        else greetingEl.textContent = "Good Night ✨";
+
+        // 2. Lightbox Logic
+        const trigger = document.getElementById('avatarTrigger');
+        const imgModal = document.getElementById('imageModal');
+
+        trigger.addEventListener('click', () => {
+            imgModal.classList.add('active');
+        });
+
+        imgModal.addEventListener('click', () => {
+            imgModal.classList.remove('active');
+        });
+
+        // 3. Share Hub & QR Logic
+        const shareBtnMain = document.getElementById('copyLinkBtn');
+        const socialBtns = document.querySelectorAll('.social-btn');
+        const shareModal = document.getElementById('shareModal');
+        const hubTitle = document.getElementById('hubTitle');
+        const hubOpenBtn = document.getElementById('hubOpenBtn');
+        const qrContainer = document.getElementById('qrcode');
+        const qrPlatform = document.getElementById('qrPlatform');
+        const downloadBtn = document.getElementById('downloadQR');
+        const copyLinkHub = document.getElementById('copyLinkHub');
+        const toast = document.getElementById('toast');
+
+        let currentShareURL = "";
+        let qrcodeInstance = null;
+
+        function openShareHub(url, title, platform) {
+            currentShareURL = url;
+            hubTitle.textContent = title;
+            qrPlatform.textContent = platform;
+            hubOpenBtn.href = url;
+
+            // Show Modal
+            shareModal.classList.add('active');
+
+            // Generate QR
+            qrContainer.innerHTML = "";
+            qrcodeInstance = new QRCode(qrContainer, {
+                text: url,
+                width: 200,
+                height: 200,
+                colorDark: "#0F172A",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        // Main Profile Share
+        shareBtnMain.addEventListener('click', () => {
+            const finalURL = PRODUCTION_URL || window.location.href;
+            openShareHub(finalURL, "Share Profile", "Digital Profile");
+        });
+
+        // Individual Social Shares
+        socialBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const url = btn.getAttribute('data-url');
+                const type = btn.getAttribute('data-type');
+                openShareHub(url, `Share ${type}`, type);
+            });
+        });
+
+        function closeHub() {
+            shareModal.classList.remove('active');
+        }
+
+        document.getElementById('closeShare').addEventListener('click', closeHub);
+        document.getElementById('closeHubBtn').addEventListener('click', closeHub);
+
+        // Copy Link
+        copyLinkHub.addEventListener('click', () => {
+            navigator.clipboard.writeText(currentShareURL);
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        });
+
+        // Download Full QR Card
+        downloadBtn.addEventListener('click', () => {
+            const qrCard = document.querySelector('.qr-card');
+
+            // Add a small temporary style to ensure perfect capture
+            qrCard.style.transform = "none";
+
+            html2canvas(qrCard, {
+                backgroundColor: "#ffffff",
+                scale: 3, // Ultra-high resolution
+                useCORS: true,
+                logging: false,
+                letterRendering: 1
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png', 1.0);
+                link.download = `${hubTitle.textContent.replace(' ', '_')}_Card.png`;
+                link.click();
+            });
+        });
+
+        // 4. Advanced Interaction & Dynamic Particle System
+        const card = document.querySelector('.profile-card');
+        const bg = document.querySelector('.galaxy-bg');
+        const socialIcons = document.querySelectorAll('.social-btn');
+
+        let mouseX = 0, mouseY = 0;
+        let gyroX = 0, gyroY = 0;
+        let targetX = 0, targetY = 0;
+        let hasGyro = false;
+
+        // Smooth Interpolation
+        function lerp(start, end, amt) {
+            return (1 - amt) * start + amt * end;
+        }
+
+        // Track Hover State for Icons
+        socialIcons.forEach(icon => {
+            icon.isHovered = false;
+            icon.addEventListener('mouseenter', () => icon.isHovered = true);
+            icon.addEventListener('mouseleave', () => icon.isHovered = false);
+        });
+
+        // Mouse Parallax
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        // Mobile Gyroscope
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', (e) => {
+                if (e.beta !== null && e.gamma !== null) {
+                    hasGyro = true;
+                    // Normalize gyro data
+                    gyroY = Math.max(-1, Math.min(1, e.gamma / 45));
+                    gyroX = Math.max(-1, Math.min(1, (e.beta - 45) / 45));
+                }
+            });
+        }
+
+        // Particle System Setup
+        // --- ADVANCED CANVAS PARTICLE SYSTEM (Game-grade Performance) ---
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        const particles = [];
+        const colors = ['#00f2ff', '#ff00ea', '#ffcc00', '#ffffff', '#7000ff', '#ff5e00', '#00ff88'];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let fastTargetX = 0;
+        let fastTargetY = 0;
+
+        function createParticles() {
+            particles.length = 0;
+            const count = window.innerWidth < 768 ? 100 : 200; // Optimized for device
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * 100, // Percentage based for responsiveness
+                    y: Math.random() * 100,
+                    z: Math.random() * 2 + 0.5, // Depth for parallax
+                    size: Math.random() * 5 + 2.5, // MASSIVE SIZE for high visibility
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speed: 0.005 + Math.random() * 0.01,
+                    progress: Math.random(),
+                    isSpiky: Math.random() > 0.8
+                });
+            }
+        }
+        createParticles();
+
+        function drawStar(ctx, x, y, size, brightness, color, isSpiky) {
+            ctx.globalAlpha = brightness;
+            ctx.fillStyle = color;
+            
+            if (isSpiky) {
+                // Draw star spikes
+                ctx.beginPath();
+                for (let i = 0; i < 5; i++) {
+                    ctx.lineTo(Math.cos((18 + i * 72) / 180 * Math.PI) * size + x,
+                               Math.sin((18 + i * 72) / 180 * Math.PI) * size + y);
+                    ctx.lineTo(Math.cos((54 + i * 72) / 180 * Math.PI) * (size/2) + x,
+                               Math.sin((54 + i * 72) / 180 * Math.PI) * (size/2) + y);
+                }
+                ctx.closePath();
+                ctx.fill();
+            } else {
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Glow effect (Expensive but safe on Canvas)
+            ctx.shadowBlur = brightness * 10;
+            ctx.shadowColor = color;
+        }
+
+        // Viewport Culling & Visibility State
+        let isPageVisible = true;
+        let animationFrameId;
+
+        document.addEventListener('visibilitychange', () => {
+            isPageVisible = !document.hidden;
+            if (isPageVisible) {
+                updateFrame(); // Resume animation
+            } else {
+                cancelAnimationFrame(animationFrameId); // Pause animation
+            }
+        });
+
+        function updateFrame() {
+            if (!isPageVisible) return; // Failsafe pause
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const inputX = hasGyro ? gyroY : mouseX;
+            const inputY = hasGyro ? gyroX : mouseY;
+
+            targetX = lerp(targetX, inputX, 0.08); // Smooth for background
+            targetY = lerp(targetY, inputY, 0.08);
+            
+            fastTargetX = lerp(fastTargetX, inputX, 0.45); // FAST reaction for icons
+            fastTargetY = lerp(fastTargetY, inputY, 0.45);
+
+            // BG and Card movement
+            bg.style.transform = `translate3d(${targetX * -35}px, ${targetY * -35}px, 0) scale(1.18)`;
+            card.style.transform = `rotateX(${targetY * -12}deg) rotateY(${targetX * 12}deg)`;
+
+            // 3D Glare Calculation
+            const glareX = 50 + (targetX * -80); 
+            const glareY = 50 + (targetY * -80);
+            const tiltMagnitude = Math.sqrt(targetX * targetX + targetY * targetY);
+            const glareOpacity = Math.min(tiltMagnitude * 2.0, 0.85); // Increased brightness cap
+            
+            card.style.setProperty('--glare-x', `${glareX}%`);
+            card.style.setProperty('--glare-y', `${glareY}%`);
+            card.style.setProperty('--glare-opacity', glareOpacity);
+
+            // Social Icons (Reacts quickly to catch shaking)
+            socialIcons.forEach((icon, index) => {
+                if (icon.isHovered || hasGyro) {
+                    const power = icon.isHovered ? 18 : 10;
+                    icon.style.transform = `translate3d(${fastTargetX * power}px, ${fastTargetY * power}px, 0) rotate(${fastTargetX * 12}deg)`;
+                } else {
+                    icon.style.transform = `translate3d(0, 0, 0)`;
+                }
+            });
+
+            // Render Particles on Canvas with Viewport Culling
+            particles.forEach(p => {
+                p.progress += p.speed;
+                if (p.progress >= 1) {
+                    p.progress = 0;
+                    p.x = Math.random() * 100;
+                    p.y = Math.random() * 100;
+                    p.color = colors[Math.floor(Math.random() * colors.length)];
+                }
+
+                const brightness = (Math.sin(p.progress * Math.PI * 2) + 1) / 2;
+                
+                // Calculate Parallax Position
+                const pX = (p.x / 100 * canvas.width) + (targetX * p.z * 60);
+                const pY = (p.y / 100 * canvas.height) + (targetY * p.z * 60);
+                
+                // VIEWPORT CULLING: Only draw if within screen bounds (plus a small buffer)
+                const buffer = 20;
+                if (pX > -buffer && pX < canvas.width + buffer && 
+                    pY > -buffer && pY < canvas.height + buffer) {
+                    drawStar(ctx, pX, pY, p.size * (0.8 + brightness * 0.4), brightness, p.color, p.isSpiky);
+                }
+            });
+
+            animationFrameId = requestAnimationFrame(updateFrame);
+        }
+
+        updateFrame();
+    </script>
+</body>
+
+</html>
