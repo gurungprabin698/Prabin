@@ -171,6 +171,8 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.8);
   position: relative;
   overflow: hidden;
+  contain: content;
+  will-change: transform;
   --glare-x: 50%;
   --glare-y: 50%;
   --glare-opacity: 0;
